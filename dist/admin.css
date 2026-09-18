@@ -21,3 +21,54 @@
 .admin-back { display: block; margin-top: 24px; font-size: 14px; color: var(--red); text-align: center; }
 .admin-back:hover { text-decoration: underline; }
 @media (max-width: 480px) { .admin-card { padding: 26px 22px; } .admin-card h1 { font-size: 23px; } }
+
+.admin-card.manager-open { max-width: 1100px; }
+.manager-heading, .manager-toolbar, .editor-actions, .editor-checks { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.manager-heading, .manager-toolbar { justify-content: space-between; }
+.admin-card .manager-heading .button, .admin-card .manager-toolbar .button, .editor-actions .button, .menu-row-actions .button { width: auto; }
+.manager-toolbar { margin: 22px 0; font-size: 14px; color: var(--muted); }
+#menu-notice { margin-top: 18px; font-size: 14px; }
+#menu-notice:empty { display: none; }
+#menu-error { padding: 12px; margin-top: 16px; color: var(--red); background: var(--cream); border-left: 3px solid var(--red); }
+#menu-editor { padding: 24px; border: 1px solid var(--line); background: var(--cream); margin-bottom: 24px; }
+#menu-editor h3 { font-size: 20px; margin-bottom: 18px; }
+#menu-fields { padding: 0; margin: 0; border: 0; min-width: 0; }
+.editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.editor-grid label { font-size: 14px; font-weight: 600; min-width: 0; }
+.editor-grid input, .editor-grid textarea { display: block; width: 100%; min-height: 46px; margin-top: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper); color: var(--ink); font: inherit; font-size: 16px; }
+.editor-grid textarea { resize: vertical; }
+.editor-grid small { font-size: 12px; font-weight: 400; color: var(--muted); }
+.editor-wide { grid-column: 1 / -1; }
+.editor-checks { margin: 22px 0; }
+.editor-checks label { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.editor-checks input { width: 18px; height: 18px; accent-color: var(--red); }
+.admin-menu-list { display: grid; gap: 16px; }
+.admin-menu-row { display: grid; grid-template-columns: 110px 1fr; gap: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 3px; min-width: 0; }
+.admin-item-image { width: 110px; height: 110px; background: var(--cream); border: 1px solid var(--line); display: grid; place-items: center; overflow: hidden; font-size: 12px; color: var(--muted); text-align: center; }
+.admin-item-image img { height: 100%; width: 100%; object-fit: cover; }
+.admin-item-info { min-width: 0; overflow-wrap: anywhere; }
+.admin-item-info h3 { font-size: 19px; }
+.admin-item-description { white-space: pre-wrap; font-size: 14px; color: var(--muted); margin: 8px 0; }
+.admin-item-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; }
+.menu-badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.menu-badge { border: 1px solid var(--line); padding: 2px 9px; font-size: 12px; border-radius: 3px; }
+.menu-badge.recommended { background: var(--red); color: white; border-color: var(--red); }
+.menu-badge.unavailable { color: var(--muted); background: var(--cream); }
+.menu-row-actions { grid-column: 2; display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.menu-row-actions .button { padding: 8px 14px; min-height: 44px; font-size: 14px; }
+.admin-empty { padding: 30px; background: var(--cream); text-align: center; color: var(--muted); }
+.manager-open #session-actions { max-width: 280px; }
+#delete-dialog { max-width: 460px; width: calc(100% - 40px); border: 1px solid var(--line); border-radius: 4px; padding: 28px; color: var(--ink); background: var(--paper); }
+#delete-dialog::backdrop { background: #0008; }
+#delete-dialog h2 { font-size: 23px; }
+#delete-description { margin: 18px 0 24px; overflow-wrap: anywhere; }
+@media (max-width: 580px) {
+  .manager-heading { align-items: stretch; flex-direction: column; }
+  .editor-grid { grid-template-columns: 1fr; }
+  #menu-editor { padding: 16px; }
+  .admin-menu-row { grid-template-columns: 72px 1fr; gap: 12px; padding: 14px; }
+  .admin-item-image { width: 72px; height: 72px; }
+  .menu-row-actions { grid-column: 1 / -1; }
+  .menu-row-actions .button { flex: 1 1 auto; }
+  .editor-actions .button { flex: 1; }
+}

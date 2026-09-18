@@ -34,14 +34,36 @@
       </fieldset>
     </form>
     <section id="admin-dashboard" aria-labelledby="dashboard-title" hidden>
-      <h2 id="dashboard-title" tabindex="-1">Admin Dashboard</h2>
-      <p>Logged in successfully</p>
-      <p class="admin-intro">เข้าสู่ระบบผู้ดูแลสำเร็จ</p>
+      <div class="manager-heading"><h2 id="dashboard-title" tabindex="-1">จัดการเมนูอาหาร</h2><button type="button" id="add-menu" class="button primary">+ เพิ่มเมนูใหม่</button></div>
+      <p id="menu-notice" role="status" aria-live="polite"></p>
+      <p id="menu-error" role="alert" hidden></p>
+      <div class="manager-toolbar"><p id="menu-count"></p><button type="button" id="reload-menu" class="button outline">โหลดรายการอีกครั้ง</button></div>
+      <form id="menu-editor" hidden aria-labelledby="editor-title">
+        <h3 id="editor-title">เพิ่มเมนูใหม่</h3>
+        <fieldset id="menu-fields">
+          <div class="editor-grid">
+            <label>ชื่อเมนู <span aria-hidden="true">*</span><input id="item-name" name="name" required maxlength="200"></label>
+            <label>ราคา (บาท) <span aria-hidden="true">*</span><input id="item-price" name="price" type="number" min="0" step="any" inputmode="decimal" required></label>
+            <label class="editor-wide">รายละเอียด<textarea id="item-description" name="description" rows="3"></textarea></label>
+            <label>หมวดหมู่<input id="item-category" name="category" list="menu-categories"><datalist id="menu-categories"><option value="ผัด"><option value="ต้ม"><option value="ทอด"><option value="ยำ"><option value="เครื่องดื่ม"></datalist></label>
+            <label>ลำดับแสดงผล<input id="item-order" name="display_order" type="number" min="-2147483648" max="2147483647" step="1" value="0" required></label>
+            <label class="editor-wide">ลิงก์รูปภาพ<input id="item-image" name="image_url" type="url" placeholder="https://…" aria-describedby="image-help"><small id="image-help">ใส่ลิงก์ http หรือ https หรือเว้นว่างได้</small></label>
+          </div>
+          <div class="editor-checks"><label><input id="item-recommended" name="is_recommended" type="checkbox"> เมนูแนะนำ</label><label><input id="item-available" name="is_available" type="checkbox" checked> พร้อมจำหน่าย</label></div>
+          <div class="editor-actions"><button id="save-menu" type="submit" class="button primary">บันทึกเมนู</button><button id="cancel-edit" type="button" class="button outline">ยกเลิก</button></div>
+        </fieldset>
+      </form>
+      <div id="admin-menu-list" class="admin-menu-list" aria-busy="false"></div>
     </section>
     <div id="session-actions" hidden><button class="button outline" id="logout-button" type="button">ออกจากระบบ / Logout</button></div>
     <button class="button outline" id="retry-button" type="button" hidden>ลองเชื่อมต่ออีกครั้ง</button>
     <a class="admin-back" href="/">กลับหน้าเว็บไซต์</a>
     <noscript><p>กรุณาเปิด JavaScript เพื่อเข้าสู่ระบบผู้ดูแล</p></noscript>
   </main>
+  <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+    <h2 id="delete-title">ยืนยันการลบเมนู</h2>
+    <p id="delete-description"></p>
+    <div class="editor-actions"><button id="cancel-delete" type="button" class="button outline" autofocus>ยกเลิก</button><button id="confirm-delete" type="button" class="button primary">ลบเมนู</button></div>
+  </dialog>
 </body>
 </html>
