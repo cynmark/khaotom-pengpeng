@@ -5,6 +5,7 @@
   'use strict';
 
   let clientPromise;
+  let adminClientPromise;
 
   function readConfig() {
     const config = window.PENG_PENG_SUPABASE_CONFIG;
@@ -55,5 +56,27 @@
 
   // Later integration: const client = await window.PengPengSupabase.getClient();
   // Callers must catch errors; they must not replace the menu on failure.
-  window.PengPengSupabase = Object.freeze({ getClient });
+  // Separate admin session; public pages retain their non-persistent client.
+  async function getAdminClient() {
+    if (!adminClientPromise) {
+      const { projectUrl, publishableKey } = readConfig();
+      adminClientPromise = import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm')
+        .then(({ createClient }) => createClient(projectUrl, publishableKey, {
+          db: { schema: 'public' },
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: false,
+            storageKey: `peng-peng-admin-${new URL(projectUrl).hostname}`
+          }
+        }))
+        .catch(() => {
+          adminClientPromise = undefined;
+          throw new Error('Could not initialize the admin connection. Please try again.');
+        });
+    }
+    return adminClientPromise;
+  }
+
+  window.PengPengSupabase = Object.freeze({ getClient, getAdminClient });
 })();

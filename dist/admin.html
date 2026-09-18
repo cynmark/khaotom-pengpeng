@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#991f25">
+  <title>เข้าสู่ระบบผู้ดูแล | ข้าวต้มเพ่งเพ้ง</title>
+  <link rel="icon" href="/assets/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/admin.css">
+  <script src="/supabase-config.js" defer></script>
+  <script src="/supabase-client.js" defer></script>
+  <script src="/admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <main class="admin-card" id="admin-main" aria-busy="true">
+    <a class="admin-brand" href="/" aria-label="กลับเว็บไซต์ข้าวต้มเพ่งเพ้ง"><img src="/assets/logo.png" alt="ข้าวต้มเพ่งเพ้ง" width="447" height="447"></a>
+    <p class="eyebrow">ADMINISTRATION</p>
+    <h1>พื้นที่สำหรับผู้ดูแลร้าน</h1>
+    <p class="admin-intro">ข้าวต้มเพ่งเพ้ง · เข้าสู่ระบบสำหรับผู้ดูแลเท่านั้น</p>
+    <p id="admin-status" role="status" aria-live="polite">กำลังตรวจสอบการเข้าสู่ระบบ…</p>
+    <p id="admin-error" role="alert" hidden></p>
+    <form id="admin-login" hidden>
+      <fieldset id="login-fields" disabled>
+        <label for="admin-email">อีเมล</label>
+        <input id="admin-email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required>
+        <label for="admin-password">รหัสผ่าน</label>
+        <input id="admin-password" name="password" type="password" autocomplete="current-password" required>
+        <button class="button primary" id="login-button" type="submit">เข้าสู่ระบบ / Login</button>
+      </fieldset>
+    </form>
+    <section id="admin-dashboard" aria-labelledby="dashboard-title" hidden>
+      <h2 id="dashboard-title" tabindex="-1">Admin Dashboard</h2>
+      <p>Logged in successfully</p>
+      <p class="admin-intro">เข้าสู่ระบบผู้ดูแลสำเร็จ</p>
+    </section>
+    <div id="session-actions" hidden><button class="button outline" id="logout-button" type="button">ออกจากระบบ / Logout</button></div>
+    <button class="button outline" id="retry-button" type="button" hidden>ลองเชื่อมต่ออีกครั้ง</button>
+    <a class="admin-back" href="/">กลับหน้าเว็บไซต์</a>
+    <noscript><p>กรุณาเปิด JavaScript เพื่อเข้าสู่ระบบผู้ดูแล</p></noscript>
+  </main>
+</body>
+</html>

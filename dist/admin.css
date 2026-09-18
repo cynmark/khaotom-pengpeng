@@ -1,0 +1,23 @@
+/* Admin-only styles. Public styles and page layouts are unchanged. */
+.admin-page { min-height: 100vh; display: grid; place-items: center; padding: 32px 20px; }
+.admin-card { width: 100%; max-width: 460px; padding: 36px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; }
+.admin-brand { display: block; width: 90px; margin-bottom: 22px; }
+.admin-brand img { width: 100%; height: auto; object-fit: contain; }
+.admin-card .eyebrow { font-size: 12px; margin-bottom: 12px; }
+.admin-card h1 { font-size: 25px; line-height: 1.5; }
+.admin-intro { font-size: 14px; color: var(--muted); margin-top: 10px; }
+#admin-status { font-size: 14px; color: var(--muted); margin-top: 22px; }
+#admin-status:empty { display: none; }
+#admin-error { margin-top: 20px; padding: 12px 14px; border-left: 3px solid var(--red); background: var(--cream); color: var(--red); font-size: 14px; }
+#admin-login { margin-top: 24px; }
+#login-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+#login-fields label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+#login-fields input { width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper); color: var(--ink); padding: 10px 12px; margin-bottom: 20px; }
+.admin-card .button { width: 100%; }
+.admin-card button:disabled { cursor: wait; opacity: .65; transform: none; }
+#admin-dashboard { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 24px; }
+#admin-dashboard h2 { font-size: 24px; margin-bottom: 10px; }
+#session-actions, #retry-button { margin-top: 24px; }
+.admin-back { display: block; margin-top: 24px; font-size: 14px; color: var(--red); text-align: center; }
+.admin-back:hover { text-decoration: underline; }
+@media (max-width: 480px) { .admin-card { padding: 26px 22px; } .admin-card h1 { font-size: 23px; } }
