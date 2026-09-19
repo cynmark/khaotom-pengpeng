@@ -8,9 +8,10 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='5' fill='%23991f25'/%3E%3Cpath d='M8 19h24a12 12 0 0 1-24 0m7 15h10M15 7v7m5-9v9m5-7v7' fill='none' stroke='%23fff5e6' stroke-width='2.5'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script>
+  <link rel="stylesheet" href="/styles.css">
   <script src="/supabase-config.js" defer></script>
   <script src="/supabase-client.js" defer></script>
+  <script src="/app.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">ข้ามไปยังเนื้อหา</a>
@@ -23,9 +24,10 @@
     <section class="menu-page container">
       <a class="breadcrumb" href="/">หน้าแรก / <span>เมนูอาหาร</span></a>
       <div class="menu-title"><p class="eyebrow">SOMETHING FOR EVERY APPETITE</p><h1>เลือกจานโปรด<br><span>ให้มื้อนี้อร่อยขึ้น</span></h1><p>ข้าวต้มร้อน ๆ กับข้าวรสคุ้นเคย เลือกความอร่อยในแบบของคุณ</p></div>
-      <div class="menu-toolbar"><div class="filters" role="group" aria-label="หมวดหมู่อาหาร"><button class="filter-button" data-category="ทั้งหมด" aria-pressed="true">ทั้งหมด</button><button class="filter-button" data-category="เมนูแนะนำ" aria-pressed="false">เมนูแนะนำ</button><button class="filter-button" data-category="ผัด" aria-pressed="false">ผัด</button><button class="filter-button" data-category="ต้ม" aria-pressed="false">ต้ม</button><button class="filter-button" data-category="ทอด" aria-pressed="false">ทอด</button><button class="filter-button" data-category="ยำ" aria-pressed="false">ยำ</button><button class="filter-button" data-category="เครื่องดื่ม" aria-pressed="false">เครื่องดื่ม</button></div><div class="search-wrap"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="sr-only" for="menu-search">ค้นหาชื่อเมนูอาหาร</label><input type="search" id="menu-search" placeholder="ค้นหาเมนูที่อยากกิน…" autocomplete="off"><button id="clear-search" aria-label="ล้างคำค้นหา" hidden>×</button></div></div>
+      <div class="menu-toolbar"><div class="filters" role="group" aria-label="หมวดหมู่อาหาร"></div><div class="search-wrap"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="sr-only" for="menu-search">ค้นหาชื่อเมนู คำอธิบาย หรือหมวดหมู่</label><input type="search" id="menu-search" placeholder="ค้นหาเมนูที่อยากกิน…" autocomplete="off"><button id="clear-search" aria-label="ล้างคำค้นหา" hidden>×</button></div></div>
       <div class="menu-results-heading"><h2>เมนูอาหาร</h2><span id="result-count" role="status" aria-live="polite"></span></div>
-      <p class="data-note">เมนูและราคาเป็นตัวอย่างสำหรับเว็บไซต์ กรุณาสอบถามรายการจริงจากร้าน • ภาพประกอบไม่ใช่ภาพจากร้าน</p>
+      <p class="data-note" id="menu-load-status" role="status" aria-live="polite">กำลังโหลดเมนู...</p>
+      <button id="retry-menu" class="button outline" type="button" hidden>ลองอีกครั้ง</button>
       <div class="menu-grid" id="menu-grid"></div><div id="empty-results" hidden><span aria-hidden="true">⌕</span><h2>ยังไม่พบเมนูที่ค้นหา</h2><p>ลองใช้คำค้นอื่น หรือดูอาหารทุกหมวดหมู่</p><button id="reset-filters" class="button primary">ดูเมนูทั้งหมด</button></div>
       <div class="menu-bottom-note"><span aria-hidden="true">✳</span><p>มีคำถามเกี่ยวกับวัตถุดิบหรืออาหารที่แพ้?<br><a href="/#contact">ติดต่อร้านก่อนสั่งอาหาร ↗</a></p></div>
       <noscript><p>กรุณาเปิด JavaScript เพื่อค้นหาและกรองเมนู หรือติดต่อร้านผ่าน <a href="https://www.facebook.com/pengpeng1944">Facebook</a></p></noscript>
