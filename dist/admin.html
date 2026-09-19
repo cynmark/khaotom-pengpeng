@@ -11,10 +11,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/admin.css">
+  <link rel="stylesheet" href="/admin.css?v=5">
   <script src="/supabase-config.js" defer></script>
   <script src="/supabase-client.js" defer></script>
-  <script src="/admin.js" defer></script>
+  <script src="/admin-gallery.js?v=5" defer></script>
+  <script src="/admin.js?v=5" defer></script>
 </head>
 <body class="admin-page">
   <main class="admin-card" id="admin-main" aria-busy="true">
@@ -54,6 +55,27 @@
         </fieldset>
       </form>
       <div id="admin-menu-list" class="admin-menu-list" aria-busy="false"></div>
+      <section id="gallery-manager" aria-labelledby="gallery-heading">
+        <div class="manager-heading"><h2 id="gallery-heading">จัดการภาพร้าน · Gallery Management</h2><button id="add-gallery" type="button" class="button primary">+ เพิ่มภาพใหม่</button></div>
+        <p id="gallery-notice" role="status" aria-live="polite"></p>
+        <p id="gallery-error" role="alert" hidden></p>
+        <div class="manager-toolbar"><p id="gallery-count"></p><button id="reload-gallery" type="button" class="button outline">โหลดภาพอีกครั้ง</button></div>
+        <form id="gallery-editor" aria-labelledby="gallery-editor-title" hidden>
+          <h3 id="gallery-editor-title">เพิ่มภาพใหม่</h3>
+          <fieldset id="gallery-fields">
+            <div class="editor-grid">
+              <label>ชื่อภาพ<input id="gallery-title" name="title" maxlength="200"></label>
+              <label>ลำดับแสดงผล<input id="gallery-order" name="display_order" type="number" min="-2147483648" max="2147483647" step="1" value="0" required></label>
+              <label class="editor-wide">รายละเอียดภาพ<textarea id="gallery-description" name="description" rows="3"></textarea></label>
+              <label class="editor-wide">ลิงก์รูปภาพ<input id="gallery-image" name="image_url" type="url" placeholder="https://…" aria-describedby="gallery-image-help"><small id="gallery-image-help">ใส่ลิงก์ http หรือ https หรือเว้นว่างได้</small></label>
+            </div>
+            <div id="gallery-preview" class="admin-item-image" aria-label="ภาพตัวอย่าง">ไม่มีรูปภาพ</div>
+            <div class="editor-checks"><label><input id="gallery-visible" name="is_visible" type="checkbox" checked> แสดงภาพ</label></div>
+            <div class="editor-actions"><button id="save-gallery" type="submit" class="button primary">บันทึกภาพ</button><button id="cancel-gallery-edit" type="button" class="button outline">ยกเลิก</button></div>
+          </fieldset>
+        </form>
+        <div id="admin-gallery-list" class="admin-menu-list" aria-busy="false"></div>
+      </section>
     </section>
     <div id="session-actions" hidden><button class="button outline" id="logout-button" type="button">ออกจากระบบ / Logout</button></div>
     <button class="button outline" id="retry-button" type="button" hidden>ลองเชื่อมต่ออีกครั้ง</button>
@@ -64,6 +86,11 @@
     <h2 id="delete-title">ยืนยันการลบเมนู</h2>
     <p id="delete-description"></p>
     <div class="editor-actions"><button id="cancel-delete" type="button" class="button outline" autofocus>ยกเลิก</button><button id="confirm-delete" type="button" class="button primary">ลบเมนู</button></div>
+  </dialog>
+  <dialog id="gallery-delete-dialog" aria-labelledby="gallery-delete-title" aria-describedby="gallery-delete-description">
+    <h2 id="gallery-delete-title">ยืนยันการลบภาพ</h2>
+    <p id="gallery-delete-description"></p>
+    <div class="editor-actions"><button id="cancel-gallery-delete" type="button" class="button outline" autofocus>ยกเลิก</button><button id="confirm-gallery-delete" type="button" class="button primary">ลบภาพ</button></div>
   </dialog>
 </body>
 </html>

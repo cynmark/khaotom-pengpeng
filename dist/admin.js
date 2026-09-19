@@ -15,6 +15,7 @@
 
   function setBusy(value) {
     busy = value;
+    gallery.setBusy(value);
     el('admin-main').setAttribute('aria-busy', String(value));
     el('login-fields').disabled = value;
     el('logout-button').disabled = value;
@@ -100,6 +101,7 @@
       el('dashboard-title').focus();
       await loadMenu();
     }
+    if (current === revision && load && !gallery.loaded) await gallery.load();
     return current === revision;
   }
 
@@ -178,6 +180,7 @@
   });
 
   function resetManager() {
+    gallery.reset();
     items = [];
     managerLoaded = false;
     editingId = deletingId = null;
@@ -411,6 +414,14 @@
     const id = deletingId;
     el('delete-dialog').close();
     void mutate(() => client.from('menu_items').delete().eq('id', id).select('id::text'), 'ลบเมนูอาหารแล้ว');
+  });
+  // Gallery shares the existing verified session and operation lock. It never
+  // creates another auth client or changes menu operations.
+  const gallery = window.createAdminGallery({
+    el, node, safeImageUrl, verifyAdmin, setBusy, signOutToLogin, locked,
+    get client() { return client; },
+    get busy() { return busy; },
+    get revision() { return revision; }
   });
   void start();
 })();
