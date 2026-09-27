@@ -11,11 +11,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
-  <link rel="stylesheet" href="/admin.css?v=5">
+  <link rel="stylesheet" href="/admin.css?v=7b">
   <script src="/supabase-config.js" defer></script>
   <script src="/supabase-client.js" defer></script>
   <script src="/admin-gallery.js?v=5" defer></script>
-  <script src="/admin.js?v=5" defer></script>
+  <script src="/admin-upload.js?v=7b" defer></script>
+  <script src="/admin.js?v=7b" defer></script>
 </head>
 <body class="admin-page">
   <main class="admin-card" id="admin-main" aria-busy="true">
@@ -48,8 +49,17 @@
             <label class="editor-wide">รายละเอียด<textarea id="item-description" name="description" rows="3"></textarea></label>
             <label>หมวดหมู่<input id="item-category" name="category" list="menu-categories"><datalist id="menu-categories"><option value="ผัด"><option value="ต้ม"><option value="ทอด"><option value="ยำ"><option value="เครื่องดื่ม"></datalist></label>
             <label>ลำดับแสดงผล<input id="item-order" name="display_order" type="number" min="-2147483648" max="2147483647" step="1" value="0" required></label>
+              <div class="editor-wide upload-control">
+                <label for="item-file">อัปโหลดภาพจากเครื่อง</label>
+                <input id="item-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="item-upload-help">
+                <small id="item-upload-help">JPEG, PNG หรือ WebP ขนาดไม่เกิน 5 MB หรือใส่ลิงก์รูปภาพด้านล่าง</small>
+                <button id="item-upload" type="button" class="button outline">อัปโหลดภาพ</button>
+                <p id="item-upload-status" role="status" aria-live="polite"></p>
+                <p id="item-upload-error" role="alert" hidden></p>
+              </div>
             <label class="editor-wide">ลิงก์รูปภาพ<input id="item-image" name="image_url" type="url" placeholder="https://…" aria-describedby="image-help"><small id="image-help">ใส่ลิงก์ http หรือ https หรือเว้นว่างได้</small></label>
           </div>
+          <div id="item-preview" class="admin-item-image" aria-label="ภาพเมนูตัวอย่าง">ไม่มีรูปภาพ</div>
           <div class="editor-checks"><label><input id="item-recommended" name="is_recommended" type="checkbox"> เมนูแนะนำ</label><label><input id="item-available" name="is_available" type="checkbox" checked> พร้อมจำหน่าย</label></div>
           <div class="editor-actions"><button id="save-menu" type="submit" class="button primary">บันทึกเมนู</button><button id="cancel-edit" type="button" class="button outline">ยกเลิก</button></div>
         </fieldset>
@@ -67,6 +77,14 @@
               <label>ชื่อภาพ<input id="gallery-title" name="title" maxlength="200"></label>
               <label>ลำดับแสดงผล<input id="gallery-order" name="display_order" type="number" min="-2147483648" max="2147483647" step="1" value="0" required></label>
               <label class="editor-wide">รายละเอียดภาพ<textarea id="gallery-description" name="description" rows="3"></textarea></label>
+              <div class="editor-wide upload-control">
+                <label for="gallery-file">อัปโหลดภาพจากเครื่อง</label>
+                <input id="gallery-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="gallery-upload-help">
+                <small id="gallery-upload-help">JPEG, PNG หรือ WebP ขนาดไม่เกิน 5 MB หรือใส่ลิงก์รูปภาพด้านล่าง</small>
+                <button id="gallery-upload" type="button" class="button outline">อัปโหลดภาพ</button>
+                <p id="gallery-upload-status" role="status" aria-live="polite"></p>
+                <p id="gallery-upload-error" role="alert" hidden></p>
+              </div>
               <label class="editor-wide">ลิงก์รูปภาพ<input id="gallery-image" name="image_url" type="url" placeholder="https://…" aria-describedby="gallery-image-help"><small id="gallery-image-help">ใส่ลิงก์ http หรือ https หรือเว้นว่างได้</small></label>
             </div>
             <div id="gallery-preview" class="admin-item-image" aria-label="ภาพตัวอย่าง">ไม่มีรูปภาพ</div>

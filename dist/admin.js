@@ -322,6 +322,7 @@
     el('item-price').value = item?.price ?? '';
     el('item-category').value = item?.category ?? '';
     el('item-image').value = item?.image_url ?? '';
+    uploads.previewMenu();
     el('item-order').value = item?.display_order ?? 0;
     el('item-recommended').checked = item?.is_recommended === true;
     el('item-available').checked = item ? item.is_available === true : true;
@@ -419,6 +420,12 @@
   // creates another auth client or changes menu operations.
   const gallery = window.createAdminGallery({
     el, node, safeImageUrl, verifyAdmin, setBusy, signOutToLogin, locked,
+    get client() { return client; },
+    get busy() { return busy; },
+    get revision() { return revision; }
+  });
+  const uploads = window.createAdminUploads({
+    el, safeImageUrl, verifyAdmin, setBusy, signOutToLogin, locked,
     get client() { return client; },
     get busy() { return busy; },
     get revision() { return revision; }

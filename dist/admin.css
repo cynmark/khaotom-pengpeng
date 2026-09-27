@@ -75,3 +75,11 @@
 
 #gallery-manager { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--line); }
 #gallery-preview { margin-top: 18px; }
+
+.upload-control { min-width: 0; }
+.upload-control input[type=file] { width: 100%; font-size: 14px; }
+.admin-card .upload-control .button { width: auto; margin-top: 12px; }
+.upload-control small { display: block; margin-top: 6px; }
+.upload-control p { font-size: 14px; margin-top: 8px; overflow-wrap: anywhere; }
+.upload-control [role=alert] { color: var(--red); }
+#item-preview { margin-top: 18px; }
