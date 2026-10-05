@@ -907,3 +907,119 @@ body:not(.admin-page) .map-embed {
 @media (max-width: 580px) {
   body:not(.admin-page) .map-embed { height: 320px; }
 }
+
+/* Verified restaurant history. */
+body:not(.admin-page) .about-layout:has(.about-history-photo) {
+  align-items: stretch;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+}
+
+body:not(.admin-page) .about-history-photo {
+  position: relative;
+  min-height: 640px;
+  margin: 0;
+  overflow: hidden;
+  border: 7px solid var(--public-paper);
+  border-radius: 130px 14px 14px 14px;
+  background: #312724;
+  box-shadow: -18px 18px 0 var(--public-red), 0 30px 66px rgba(65,32,23,.21);
+}
+
+body:not(.admin-page) .about-history-photo::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 38%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(25,13,11,.62));
+}
+
+body:not(.admin-page) .about-history-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.86) contrast(1.04);
+}
+
+body:not(.admin-page) .history-year {
+  position: absolute;
+  z-index: 1;
+  right: 22px;
+  bottom: 22px;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  padding: 11px 15px;
+  border: 1px solid rgba(244,204,123,.58);
+  border-radius: 4px 4px 14px 4px;
+  color: #f2ca78;
+  background: rgba(41,22,18,.76);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: .13em;
+  line-height: 1.45;
+  backdrop-filter: blur(8px);
+}
+
+body:not(.admin-page) .history-year span {
+  color: rgba(255,247,232,.82);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .05em;
+}
+
+body:not(.admin-page) .about-copy--history {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+body:not(.admin-page) .story-body {
+  margin-top: 27px;
+  color: #57443e;
+}
+
+body:not(.admin-page) .story-body p {
+  margin: 0;
+  font-size: .97rem;
+  line-height: 1.88;
+}
+
+body:not(.admin-page) .story-body p + p {
+  margin-top: 17px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(111,64,48,.13);
+}
+
+@media (max-width: 900px) {
+  body:not(.admin-page) .about-layout:has(.about-history-photo) {
+    grid-template-columns: minmax(0, .86fr) minmax(0, 1.14fr);
+    gap: 36px;
+  }
+  body:not(.admin-page) .about-history-photo { min-height: 610px; }
+}
+
+@media (max-width: 800px) {
+  body:not(.admin-page) .about-layout:has(.about-history-photo) {
+    grid-template-columns: 1fr;
+    gap: 46px;
+  }
+  body:not(.admin-page) .about-history-photo {
+    width: min(100%, 620px);
+    min-height: 0;
+    height: 500px;
+    border-width: 6px;
+    border-radius: 90px 10px 10px;
+    box-shadow: -10px 11px 0 var(--public-red), 0 24px 54px rgba(65,32,23,.18);
+  }
+}
+
+@media (max-width: 580px) {
+  body:not(.admin-page) .about-layout:has(.about-history-photo) { gap: 34px; }
+  body:not(.admin-page) .about-history-photo { height: 360px; }
+  body:not(.admin-page) .history-year { right: 13px; bottom: 13px; padding: 9px 12px; }
+  body:not(.admin-page) .story-body { margin-top: 22px; }
+  body:not(.admin-page) .story-body p { font-size: .94rem; line-height: 1.82; }
+  body:not(.admin-page) .story-body p + p { margin-top: 15px; padding-top: 15px; }
+}
