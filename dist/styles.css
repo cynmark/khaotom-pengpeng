@@ -894,3 +894,16 @@ body:not(.admin-page) .story-update {
   body:not(.admin-page) .about-placeholder { min-height: 290px; }
   body:not(.admin-page) .story-update { margin-block: 22px 28px; padding: 18px 19px; }
 }
+
+/* Real restaurant map: retain the existing contact card treatment. */
+body:not(.admin-page) .map-embed {
+  display: block;
+  width: 100%;
+  height: clamp(400px, 34vw, 450px);
+  border: 0;
+  background: #e7e3d8;
+}
+
+@media (max-width: 580px) {
+  body:not(.admin-page) .map-embed { height: 320px; }
+}
