@@ -2,23 +2,6 @@ document.querySelector('.nav-toggle')?.addEventListener('click',function(){const
 document.querySelectorAll('#navigation a').forEach(a=>a.addEventListener('click',()=>{document.querySelector('#navigation').classList.remove('open');document.querySelector('.nav-toggle').setAttribute('aria-expanded','false')}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelector('#navigation')?.classList.remove('open');document.querySelector('.nav-toggle')?.setAttribute('aria-expanded','false')}});
 
-// Sample menu: replace prices and availability with the restaurant's confirmed menu.
-const menu=[
- {name:'ผัดผักบุ้งไฟแดง',category:'ผัด',price:60,image:'morning-glory',description:'ผักบุ้งกรอบ ๆ ผัดไฟแรง หอมกระเทียมและพริก',popular:true},
- {name:'ยำไข่เค็ม',category:'ยำ',price:70,image:'salted-egg',description:'ไข่เค็มเนื้อมัน คลุกน้ำยำรสจัดจ้าน เปรี้ยวกลมกล่อม',popular:true},
- {name:'ยำหมูกรอบ',category:'ยำ',price:120,image:'crispy-pork',description:'หมูกรอบชิ้นพอดีคำ คลุกน้ำยำ หอมแดง และพริก',popular:true},
- {name:'โจ๊กหมูสับ',category:'ต้ม',price:50,image:'porridge',description:'โจ๊กเนื้อนุ่มกับหมูสับ โรยขิงและต้นหอม',popular:true},
- {name:'ข้าวไข่เจียวทรงเครื่อง',category:'ทอด',price:65,image:'omelet',description:'ไข่เจียวสีทอง ราดหมูสับผัดผัก เสิร์ฟพร้อมข้าว',popular:true},
- {name:'ต้มผักกาดดองซี่โครงหมู',category:'ต้ม',price:90,image:'soup',description:'ซี่โครงหมูนุ่มในน้ำซุปผักกาดดอง ซดร้อน ๆ คล่องคอ',popular:true},
- {name:'หนำเลี้ยบผัดหมูสับ',category:'ผัด',price:90,image:'olive-pork',description:'หมูสับผัดหนำเลี้ยบรสเค็มหอม คู่ข้าวต้มที่ลงตัว',popular:false},
- {name:'ข้าวต้มกุ๊ย',category:'ต้ม',price:15,image:'hero',description:'ข้าวต้มร้อน ๆ รสเรียบง่าย กินกับกับข้าวได้ทุกจาน',popular:false},
- {name:'ชาไทยเย็น',category:'เครื่องดื่ม',price:35,image:'tea',description:'ชาไทยหอมเข้ม เติมนมให้หวานมัน สดชื่น',popular:false}
-];
-const card=item=>`<article class="food-card"><div class="food-photo"><img src="/assets/${item.image}.jpg" width="600" height="400" loading="lazy" alt="${item.name}">${item.popular?'<span class="food-label">เมนูแนะนำ</span>':''}</div><div class="food-info"><div class="food-top"><h3>${item.name}</h3><span class="food-price">${item.price} <small>฿</small></span></div><p>${item.description}</p></div></article>`;
-const popularGrid=document.querySelector('#popular-grid');
-if(popularGrid)popularGrid.innerHTML=menu.filter(item=>item.popular).map(card).join('');
-
-// Only the full menu uses live data; homepage featured dishes stay unchanged.
 const menuGrid = document.querySelector('#menu-grid');
 let publicMenu = [];
 let selectedCategory = 'ทั้งหมด';
@@ -29,39 +12,104 @@ const baht = new Intl.NumberFormat('th-TH', { maximumFractionDigits: 2 });
 function menuCard(item) {
  const node = document.createElement('article');
  node.className = 'food-card';
+ const rawImageUrl = String(item.image_url ?? '').trim();
+ const hasImageUrl = rawImageUrl.length > 0;
  // This template is fixed; database content is assigned only through textContent.
- node.innerHTML = '<div class="food-photo"><img width="600" height="400" loading="lazy"></div><div class="food-info"><div class="food-top"><h3></h3><span class="food-price"></span></div><p></p></div>';
+ node.innerHTML = hasImageUrl
+  ? '<div class="food-photo"><img width="600" height="400" loading="lazy"></div><div class="food-info"><div class="food-top"><h3></h3><span class="food-price"></span></div><p class="food-description"></p></div>'
+  : '<div class="food-info"><div class="food-card-kicker" aria-hidden="true">เมนูเพ่งเพ้ง</div><div class="food-top"><h3></h3><span class="food-price"></span></div><p class="food-description"></p></div>';
+ if (!hasImageUrl) node.classList.add('food-card--text-only');
  node.querySelector('h3').textContent = item.name;
  const price = node.querySelector('.food-price');
  price.append(document.createTextNode(baht.format(Number(item.price)) + ' '));
  const unit = document.createElement('small');
  unit.textContent = 'บาท';
  price.append(unit);
- node.querySelector('p').textContent = item.description;
+ const description = node.querySelector('.food-description');
+ description.textContent = item.description;
+ if (!String(item.description ?? '').trim()) description.hidden = true;
  const photo = node.querySelector('.food-photo');
- const img = node.querySelector('img');
- const fallback = () => {
-  img.remove();
-  photo.style.cssText = 'display:grid;place-items:center;background:var(--paper);color:var(--muted)';
-  const label = document.createElement('span');
-  label.textContent = 'ยังไม่มีรูปภาพ';
-  photo.append(label);
- };
- img.alt = item.name;
- img.referrerPolicy = 'no-referrer';
- img.addEventListener('error', fallback, { once: true });
- try {
-  const url = new URL(item.image_url);
-  if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) throw new Error();
-  img.src = url.href;
- } catch { fallback(); }
+ if (hasImageUrl) {
+  const img = node.querySelector('img');
+  const fallback = () => {
+   img.remove();
+   node.classList.add('food-card--image-failed');
+   photo.classList.add('food-photo--fallback');
+   const fallbackMark = document.createElement('span');
+   fallbackMark.className = 'food-fallback-mark';
+   fallbackMark.setAttribute('aria-hidden', 'true');
+   fallbackMark.textContent = 'เพ่งเพ้ง';
+   const fallbackText = document.createElement('span');
+   fallbackText.className = 'food-fallback-text';
+   fallbackText.textContent = 'ข้าวต้มเพ่งเพ้ง';
+   photo.prepend(fallbackMark, fallbackText);
+  };
+  img.alt = item.name;
+  img.referrerPolicy = 'no-referrer';
+  img.addEventListener('error', fallback, { once: true });
+  try {
+   const url = new URL(rawImageUrl);
+   if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) throw new Error();
+   img.src = url.href;
+  } catch { fallback(); }
+ }
  if (item.is_recommended) {
   const badge = document.createElement('span');
   badge.className = 'food-label';
   badge.textContent = 'เมนูแนะนำ';
-  photo.append(badge);
+  if (photo) photo.append(badge);
+  else {
+   badge.classList.add('food-label--text');
+   node.querySelector('.food-info').prepend(badge);
+  }
  }
  return node;
+}
+
+const popularGrid = document.querySelector('#popular-grid');
+
+async function loadPopularMenu() {
+ if (!popularGrid || popularGrid.getAttribute('aria-busy') === 'true') return;
+ const status = document.querySelector('#popular-status');
+ const retry = document.querySelector('#popular-retry');
+ popularGrid.setAttribute('aria-busy', 'true');
+ retry.hidden = true;
+ status.textContent = 'กำลังโหลดเมนูแนะนำ...';
+ popularGrid.replaceChildren();
+ const controller = new AbortController();
+ const timeout = setTimeout(() => controller.abort(), 20000);
+ try {
+  const client = await Promise.race([
+   window.PengPengSupabase.getClient(),
+   new Promise((_, reject) => controller.signal.addEventListener('abort', () => reject(new Error('Timeout')), { once: true }))
+  ]);
+  const { data, error } = await client.from('menu_items')
+   .select('name,description,price,category,image_url,is_recommended')
+   .eq('is_available', true)
+   .eq('is_recommended', true)
+   .order('display_order', { ascending: true, nullsFirst: false })
+   .order('id', { ascending: true })
+   .limit(4)
+   .abortSignal(controller.signal);
+  if (error || !Array.isArray(data)) throw new Error('Recommended menu unavailable');
+  const items = data.map(item => ({ ...item,
+   name: String(item.name ?? '').trim(), description: String(item.description ?? '').trim(),
+   category: String(item.category ?? '').trim(), image_url: String(item.image_url ?? '').trim()
+  }));
+  popularGrid.replaceChildren(...items.map(menuCard));
+  status.textContent = items.length ? '' : 'ขณะนี้ยังไม่มีเมนูแนะนำ';
+ } catch {
+  status.textContent = 'ไม่สามารถโหลดเมนูแนะนำได้ในขณะนี้ กรุณาลองอีกครั้ง';
+  retry.hidden = false;
+ } finally {
+  clearTimeout(timeout);
+  popularGrid.setAttribute('aria-busy', 'false');
+ }
+}
+
+if (popularGrid) {
+ document.querySelector('#popular-retry').addEventListener('click', loadPopularMenu);
+ loadPopularMenu();
 }
 
 function updateFilters() {
