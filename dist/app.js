@@ -1,6 +1,23 @@
-document.querySelector('.nav-toggle')?.addEventListener('click',function(){const expanded=this.getAttribute('aria-expanded')==='true';this.setAttribute('aria-expanded',String(!expanded));this.setAttribute('aria-label',expanded?'เปิดเมนูนำทาง':'ปิดเมนูนำทาง');document.querySelector('#navigation').classList.toggle('open',!expanded)});
-document.querySelectorAll('#navigation a').forEach(a=>a.addEventListener('click',()=>{document.querySelector('#navigation').classList.remove('open');document.querySelector('.nav-toggle').setAttribute('aria-expanded','false')}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelector('#navigation')?.classList.remove('open');document.querySelector('.nav-toggle')?.setAttribute('aria-expanded','false')}});
+const navigation = document.querySelector('#navigation');
+const navigationToggle = document.querySelector('.nav-toggle');
+
+function setNavigationOpen(isOpen) {
+ navigation.classList.toggle('open', isOpen);
+ navigationToggle.setAttribute('aria-expanded', String(isOpen));
+ navigationToggle.setAttribute('aria-label', isOpen ? 'ปิดเมนูนำทาง' : 'เปิดเมนูนำทาง');
+}
+
+if (navigation && navigationToggle) {
+ navigationToggle.addEventListener('click', () => setNavigationOpen(!navigation.classList.contains('open')));
+ navigation.addEventListener('click', event => {
+  if (event.target.closest('a')) setNavigationOpen(false);
+ });
+ document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape' || event.defaultPrevented || document.querySelector('dialog[open]') || !navigation.classList.contains('open')) return;
+  setNavigationOpen(false);
+  navigationToggle.focus();
+ });
+}
 
 const menuGrid = document.querySelector('#menu-grid');
 let publicMenu = [];

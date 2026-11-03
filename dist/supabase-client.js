@@ -1,6 +1,4 @@
-// Plain browser JavaScript: no npm, framework, or build step.
-// The pinned SDK loads only when getClient() is explicitly called.
-// Nothing here reads/writes tables, signs in, or changes the existing menu.
+// Load the pinned SDK on demand. Public reads and Admin sessions use separate clients.
 (() => {
   'use strict';
 
@@ -54,9 +52,7 @@
     return clientPromise;
   }
 
-  // Later integration: const client = await window.PengPengSupabase.getClient();
-  // Callers must catch errors; they must not replace the menu on failure.
-  // Separate admin session; public pages retain their non-persistent client.
+  // Keep the Admin session separate from anonymous public requests.
   async function getAdminClient() {
     if (!adminClientPromise) {
       const { projectUrl, publishableKey } = readConfig();
