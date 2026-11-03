@@ -9,11 +9,11 @@ let menuState = 'loading';
 const normalizeMenuText = value => String(value ?? '').normalize('NFC').trim().toLocaleLowerCase('th');
 const baht = new Intl.NumberFormat('th-TH', { maximumFractionDigits: 2 });
 
-function menuCard(item) {
+function menuCard(item, { imageRequired = false } = {}) {
  const node = document.createElement('article');
  node.className = 'food-card';
  const rawImageUrl = String(item.image_url ?? '').trim();
- const hasImageUrl = rawImageUrl.length > 0;
+ const hasImageUrl = rawImageUrl.length > 0 || imageRequired;
  // This template is fixed; database content is assigned only through textContent.
  node.innerHTML = hasImageUrl
   ? '<div class="food-photo"><img width="600" height="400" loading="lazy"></div><div class="food-info"><div class="food-top"><h3></h3><span class="food-price"></span></div><p class="food-description"></p></div>'
@@ -83,20 +83,31 @@ async function loadPopularMenu() {
    window.PengPengSupabase.getClient(),
    new Promise((_, reject) => controller.signal.addEventListener('abort', () => reject(new Error('Timeout')), { once: true }))
   ]);
-  const { data, error } = await client.from('menu_items')
-   .select('name,description,price,category,image_url,is_recommended')
-   .eq('is_available', true)
-   .eq('is_recommended', true)
-   .order('display_order', { ascending: true, nullsFirst: false })
-   .order('id', { ascending: true })
-   .limit(4)
-   .abortSignal(controller.signal);
-  if (error || !Array.isArray(data)) throw new Error('Recommended menu unavailable');
-  const items = data.map(item => ({ ...item,
+  const rows = [];
+  const pageSize = 500;
+  for (let offset = 0; rows.length < 6; offset += pageSize) {
+   const { data, error } = await client.from('menu_items')
+    .select('name,description,price,category,image_url,is_recommended')
+    .eq('is_available', true)
+    .eq('is_recommended', true)
+    .order('display_order', { ascending: true, nullsFirst: false })
+    .order('id', { ascending: true })
+    .range(offset, offset + pageSize - 1)
+    .abortSignal(controller.signal);
+   if (error || !Array.isArray(data)) throw new Error('Recommended menu unavailable');
+   rows.push(...data.filter(item => {
+    try {
+     const url = new URL(String(item.image_url ?? '').trim());
+     return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password;
+    } catch { return false; }
+   }));
+   if (data.length < pageSize) break;
+  }
+  const items = rows.slice(0, 6).map(item => ({ ...item,
    name: String(item.name ?? '').trim(), description: String(item.description ?? '').trim(),
    category: String(item.category ?? '').trim(), image_url: String(item.image_url ?? '').trim()
   }));
-  popularGrid.replaceChildren(...items.map(menuCard));
+  popularGrid.replaceChildren(...items.map(item => menuCard(item)));
   status.textContent = items.length ? '' : 'ขณะนี้ยังไม่มีเมนูแนะนำ';
  } catch {
   status.textContent = 'ไม่สามารถโหลดเมนูแนะนำได้ในขณะนี้ กรุณาลองอีกครั้ง';
@@ -137,11 +148,67 @@ function renderMenu() {
  const results = publicMenu.filter(item =>
   (selectedCategory === 'ทั้งหมด' || (selectedCategory === 'เมนูแนะนำ' ? item.is_recommended : item.category === selectedCategory)) &&
   [item.name, item.description, item.category].some(value => normalizeMenuText(value).includes(query)));
- menuGrid.replaceChildren(...results.map(menuCard));
+ renderMenuPresentation(results);
  document.querySelector('#result-count').textContent = menuState === 'ready' ? `${results.length} เมนู` : '';
  document.querySelector('#empty-results').hidden = menuState !== 'ready' || !publicMenu.length || results.length > 0;
  document.querySelector('#clear-search').hidden = !query;
  return results;
+}
+
+function renderMenuPresentation(results) {
+ const featured = results.filter(item => item.is_recommended && String(item.image_url ?? '').trim());
+ const featuredSet = new Set(featured);
+ const classic = results.filter(item => !featuredSet.has(item));
+ const sections = [];
+ if (featured.length) {
+  const section = document.createElement('section');
+  section.className = 'featured-menu';
+  section.setAttribute('aria-labelledby', 'featured-menu-heading');
+  section.innerHTML = '<div class="menu-section-heading"><p class="eyebrow">PENG PENG FAVORITES</p><h2 id="featured-menu-heading">เมนูแนะนำ</h2></div><div class="menu-grid featured-menu-grid"></div>';
+  section.querySelector('.featured-menu-grid').replaceChildren(...featured.map(item => menuCard(item, { imageRequired: true })));
+  sections.push(section);
+ }
+ if (classic.length) {
+  const section = document.createElement('section');
+  section.className = 'classic-menu';
+  section.setAttribute('aria-labelledby', 'classic-menu-heading');
+  section.innerHTML = '<div class="menu-section-heading"><p class="eyebrow">THE MENU</p><h2 id="classic-menu-heading">รายการอาหาร</h2></div><div class="classic-menu-groups"></div>';
+  const groups = new Map();
+  classic.forEach(item => {
+   const category = item.category || 'อื่น ๆ';
+   if (!groups.has(category)) groups.set(category, []);
+   groups.get(category).push(item);
+  });
+  groups.forEach((items, category) => {
+   const group = document.createElement('div');
+   group.className = 'classic-menu-category';
+   const heading = document.createElement('h3');
+   heading.textContent = category;
+   const list = document.createElement('ul');
+   items.forEach(item => {
+    const row = document.createElement('li');
+    row.className = 'classic-menu-row';
+    const name = document.createElement('span');
+    name.className = 'classic-menu-name';
+    name.textContent = item.name;
+    if (item.is_recommended) {
+     const badge = document.createElement('small');
+     badge.className = 'classic-menu-badge';
+     badge.textContent = 'เมนูแนะนำ';
+     name.append(badge);
+    }
+    const price = document.createElement('span');
+    price.className = 'classic-menu-price';
+    price.textContent = baht.format(Number(item.price)) + ' บาท';
+    row.append(name, price);
+    list.append(row);
+   });
+   group.append(heading, list);
+   section.querySelector('.classic-menu-groups').append(group);
+  });
+  sections.push(section);
+ }
+ menuGrid.replaceChildren(...sections);
 }
 
 async function loadPublicMenu() {
@@ -212,7 +279,7 @@ if (menuGrid) {
  document.querySelector('#retry-menu').addEventListener('click', loadPublicMenu);
  loadPublicMenu();
 }
-document.querySelector('#site-footer').innerHTML=`<div class="container footer-top"><div><a class="brand" href="/"><img class="footer-logo" src="/assets/logo-gold.png" alt="ข้าวต้มเพ่งเพ้ง" width="1362" height="1155" loading="lazy"></a><p>อร่อยง่าย ๆ สไตล์ข้าวต้มเพ่งเพ้ง</p></div><div><h3>แวะมารู้จักกัน</h3><nav aria-label="เมนูท้ายเว็บไซต์"><a href="/">หน้าแรก</a><a href="/menu.html">เมนูอาหาร</a><a href="/#about">เรื่องราวของเรา</a><a href="/#gallery">ภาพร้าน</a><a href="/#contact">ติดต่อร้าน</a></nav></div><div><h3>เจอกันที่ร้าน</h3><p>312/1 ถนนพระสุเมรุ แขวงตลาดยอด<br>เขตพระนคร กรุงเทพฯ 10200</p><a class="footer-social" href="https://www.facebook.com/pengpeng1944" target="_blank" rel="noopener noreferrer">Facebook ↗</a><a class="footer-social" href="tel:+66863329959">086-332-9959</a></div></div><div class="container footer-bottom"><span>© ${new Date().getFullYear()} ข้าวต้มเพ่งเพ้ง. สงวนลิขสิทธิ์</span><a href="/credits.html">เครดิตภาพถ่าย</a><span>มื้อธรรมดา ที่อร่อยเป็นพิเศษ</span></div>`;
+document.querySelector('#site-footer').innerHTML=`<div class="container footer-top"><div><a class="brand" href="/"><img class="footer-logo" src="/assets/logo-gold.png" alt="ข้าวต้มเพ่งเพ้ง" width="1362" height="1155" loading="lazy"></a><p>อร่อยง่าย ๆ สไตล์ข้าวต้มเพ่งเพ้ง</p></div><div><h3>แวะมารู้จักกัน</h3><nav aria-label="เมนูท้ายเว็บไซต์"><a href="/">หน้าแรก</a><a href="/menu.html">เมนูอาหาร</a><a href="/#about">เรื่องราวของเรา</a><a href="/#gallery">ภาพร้าน</a><a href="/#contact">ติดต่อร้าน</a></nav></div><div><h3>เจอกันที่ร้าน</h3><p>312/1 ถนนพระสุเมรุ แขวงตลาดยอด<br>เขตพระนคร กรุงเทพฯ 10200</p><a class="footer-social" href="https://www.facebook.com/pengpeng1944" target="_blank" rel="noopener noreferrer">Facebook ↗</a><a class="footer-social" href="tel:+66863329959">086-332-9959</a></div></div><div class="container footer-bottom"><span>© ${new Date().getFullYear()} ข้าวต้มเพ่งเพ้ง. สงวนลิขสิทธิ์</span><a href="/credits.html">เครดิตและลิขสิทธิ์</a><span>มื้อธรรมดา ที่อร่อยเป็นพิเศษ</span></div>`;
 // Optional agent access uses the same live menu and visible filters.
 if (menuGrid && document.modelContext?.registerTool) {
  try {
