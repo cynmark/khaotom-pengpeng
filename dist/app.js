@@ -63,6 +63,7 @@ function menuCard(item, { imageRequired = false } = {}) {
    node.querySelector('.food-info').prepend(badge);
   }
  }
+ if (menuGrid && window.PengPengCart) node.querySelector('.food-info').append(window.PengPengCart.addButton(item));
  return node;
 }
 
@@ -201,6 +202,7 @@ function renderMenuPresentation(results) {
     price.className = 'classic-menu-price';
     price.textContent = baht.format(Number(item.price)) + ' บาท';
     row.append(name, price);
+    if (window.PengPengCart) row.append(window.PengPengCart.addButton(item));
     list.append(row);
    });
    group.append(heading, list);
@@ -233,7 +235,7 @@ async function loadPublicMenu() {
   const pageSize = 500;
   for (let offset = 0; ; offset += pageSize) {
    const { data, error } = await client.from('menu_items')
-    .select('name,description,price,category,image_url,is_recommended')
+    .select('id::text,name,description,price,category,image_url,is_recommended')
     .eq('is_available', true)
     .order('display_order', { ascending: true, nullsFirst: false })
     .order('id', { ascending: true })
@@ -248,10 +250,12 @@ async function loadPublicMenu() {
    category: String(item.category ?? '').trim(), image_url: String(item.image_url ?? '').trim()
   }));
   menuState = 'ready';
+  window.PengPengCart?.setCatalog(publicMenu);
   updateFilters();
   status.textContent = publicMenu.length ? '' : 'ยังไม่มีเมนูที่พร้อมให้บริการในขณะนี้';
  } catch {
   menuState = 'error';
+  window.PengPengCart?.fail();
   status.textContent = 'ไม่สามารถโหลดเมนูได้ในขณะนี้ กรุณาลองอีกครั้ง';
   retry.hidden = false;
  } finally {
