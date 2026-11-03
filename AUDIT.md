@@ -1,4 +1,20 @@
-# Phase 11A audit
+# Phase 11A.2 staging recheck
+
+**READY FOR STAGING DEPLOYMENT.** Use a restricted HTTPS staging origin for the remaining Admin checks. Public production approval is still pending; no staging or production deployment was performed.
+
+| Previous finding | Recheck |
+| --- | --- |
+| Anonymous API exposed 3 hidden gallery rows | **Resolved for row reads.** The unfiltered anonymous gallery query returned 4 rows, all visible. An explicit hidden-row query returned 0. Anonymous `admin_users` returned 0 rows. This does not establish whether someone with an existing public file URL can still read a hidden image. |
+| Wongnai image blocked in the browser | **Resolved for current references.** No Wongnai URL appeared in the 63 menu rows and 4 anonymously readable gallery rows. All 14 distinct non-empty image URLs were tested in Edge with the site's referrer policy. Thirteen loaded on the first pass; the Facebook CDN image that timed out loaded in its Menu card on retry. No invalid URLs or persistent image failures were found. Hidden gallery URLs were not available for inspection. |
+| Live Admin and Storage checks outstanding | **Unverified.** Signed-out Admin loaded at all three widths. No authorized live test session was available. Admin access to hidden rows, authenticated Menu/Gallery CRUD, and upload enforcement still need verification. The earlier simulated Admin results do not verify the updated policies. |
+
+Live browser checks passed for 6 homepage recommendations, 63 menu items, 4 gallery images, search/category filters, Cart quantity totals and refresh persistence, Favorites filtering and persistence, mobile navigation, Credits and its footer link. Google Maps embed and directions returned HTTP 200. Homepage, Menu, Credits, and signed-out Admin had zero horizontal overflow at 390px, 768px, and 1440px. No JavaScript exceptions were observed; the console recorded one network socket error. Separately, a **simulated image failure** (blocked external images with live menu data) displayed the intended fallback. No live mutations were attempted.
+
+**Readability only:** `dist/favorites.js` now uses one function to set the heart button's state and accessible label. `dist/favorites.css` drops a selector with no references and formats the media rules without changing breakpoints. `dist/menu.html` indents the existing toolbar, and it and `dist/index.html` refresh the Favorites asset versions. No functional fix was needed. README instructions still match the project. The shared data-loading flows, Admin session and upload code, and main CSS cascade were left intact to avoid regressions. No storage key or saved selections were reset.
+
+JavaScript syntax and `git diff --check` passed. The frontend scan found no loopback HTTP URLs, secret keys, private key markers, or embedded JWTs. The Sites manifest still points to `dist/`; serve it as the HTTPS origin root with no build step. Before production, verify the real Admin session and updated permissions on staging, confirm media rights and file privacy as applicable, and monitor the reliability of external image hosts. No restaurant data, settings, policies, or hosting configuration changed.
+
+## Phase 11A audit (historical)
 
 **NOT YET READY for a public production launch.** The static site passes local and live public smoke tests. Before launch, verify real Admin permissions on the intended HTTPS origin, decide whether hidden gallery media must be private, and confirm rights and stable sources for externally hosted and uploaded photos.
 

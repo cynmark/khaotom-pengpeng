@@ -22,15 +22,14 @@
   try { localStorage.setItem(KEY, JSON.stringify([...saved])); }
   catch { announce('บันทึกรายการโปรดในเบราว์เซอร์ไม่ได้ รายการจะอยู่จนกว่าจะปิดหน้านี้'); }
  }
- function syncButtons() {
-  document.querySelectorAll('button.favorite-button').forEach(button => {
-   const selected = saved.has(button.dataset.favoriteId);
-   button.setAttribute('aria-pressed', String(selected));
-   button.setAttribute('aria-label', (selected ? 'นำ ' : 'เพิ่ม ') + button.dataset.favoriteName + (selected ? ' ออกจากรายการโปรด' : ' ลงรายการโปรด'));
-  });
+ function updateButtonState(button) {
+  const selected = saved.has(button.dataset.favoriteId);
+  const name = button.dataset.favoriteName;
+  button.setAttribute('aria-pressed', String(selected));
+  button.setAttribute('aria-label', selected ? `นำ ${name} ออกจากรายการโปรด` : `เพิ่ม ${name} ลงรายการโปรด`);
  }
  function changed() {
-  syncButtons();
+  document.querySelectorAll('button.favorite-button').forEach(updateButtonState);
   window.dispatchEvent(new Event('peng-peng-favorites-change'));
  }
  function reconcile(items) {
@@ -48,9 +47,7 @@
   button.dataset.favoriteName = String(item.name ?? '');
   button.disabled = !validId(button.dataset.favoriteId) || item.is_available === false;
   button.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 0 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const selected = saved.has(button.dataset.favoriteId);
-  button.setAttribute('aria-pressed', String(selected));
-  button.setAttribute('aria-label', (selected ? 'นำ ' : 'เพิ่ม ') + item.name + (selected ? ' ออกจากรายการโปรด' : ' ลงรายการโปรด'));
+  updateButtonState(button);
   button.addEventListener('click', () => {
    const id = button.dataset.favoriteId;
    if (!validId(id) || (availableIds && !availableIds.has(id))) return;

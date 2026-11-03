@@ -14,11 +14,15 @@
 .favorites-toggle[aria-pressed="true"] { background: #80171d; color: #fff7e9; border-color: #80171d; }
 .favorites-toggle:hover { box-shadow: 0 3px 12px #80171d18; }
 .favorites-count { font-size: 12px; }
-.favorites-empty-hint { color: #756253; }
-@media(max-width:580px) {
+
+@media (max-width: 580px) {
  .menu-filter-controls { align-items: stretch; gap: 10px; }
  .favorites-toggle { align-self: flex-start; }
  .menu-page .classic-menu-row > .cart-add { margin-left: 0; flex: 1 1 auto; }
  .menu-page .classic-menu-row > .favorite-button { flex-basis: 44px; }
 }
-@media(prefers-reduced-motion:reduce) { .favorite-button { transition: none; } .favorite-button:active { transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+ .favorite-button { transition: none; }
+ .favorite-button:active { transform: none; }
+}
