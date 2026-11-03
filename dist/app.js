@@ -6,6 +6,7 @@ const menuGrid = document.querySelector('#menu-grid');
 let publicMenu = [];
 let selectedCategory = 'ทั้งหมด';
 let menuState = 'loading';
+let favoritesOnly = false;
 const normalizeMenuText = value => String(value ?? '').normalize('NFC').trim().toLocaleLowerCase('th');
 const baht = new Intl.NumberFormat('th-TH', { maximumFractionDigits: 2 });
 
@@ -64,6 +65,7 @@ function menuCard(item, { imageRequired = false } = {}) {
   }
  }
  if (menuGrid && window.PengPengCart) node.querySelector('.food-info').append(window.PengPengCart.addButton(item));
+ if (window.PengPengFavorites) (photo || node.querySelector('.food-info')).append(window.PengPengFavorites.createButton(item));
  return node;
 }
 
@@ -88,7 +90,7 @@ async function loadPopularMenu() {
   const pageSize = 500;
   for (let offset = 0; rows.length < 6; offset += pageSize) {
    const { data, error } = await client.from('menu_items')
-    .select('name,description,price,category,image_url,is_recommended')
+    .select('id::text,name,description,price,category,image_url,is_recommended')
     .eq('is_available', true)
     .eq('is_recommended', true)
     .order('display_order', { ascending: true, nullsFirst: false })
@@ -147,12 +149,18 @@ function updateFilters() {
 function renderMenu() {
  const query = normalizeMenuText(document.querySelector('#menu-search').value);
  const results = publicMenu.filter(item =>
+  (!favoritesOnly || window.PengPengFavorites?.has(item.id)) &&
   (selectedCategory === 'ทั้งหมด' || (selectedCategory === 'เมนูแนะนำ' ? item.is_recommended : item.category === selectedCategory)) &&
   [item.name, item.description, item.category].some(value => normalizeMenuText(value).includes(query)));
  renderMenuPresentation(results);
  document.querySelector('#result-count').textContent = menuState === 'ready' ? `${results.length} เมนู` : '';
  document.querySelector('#empty-results').hidden = menuState !== 'ready' || !publicMenu.length || results.length > 0;
  document.querySelector('#clear-search').hidden = !query;
+ const empty = document.querySelector('#empty-results');
+ const noFavorites = favoritesOnly && !window.PengPengFavorites?.count();
+ empty.querySelector('h2').textContent = noFavorites ? 'ยังไม่มีรายการโปรด' : 'ยังไม่พบเมนูที่ค้นหา';
+ empty.querySelector('p').textContent = noFavorites ? 'กดหัวใจที่เมนูที่ชอบ เพื่อเก็บไว้ในรายการโปรดของคุณ' : 'ลองใช้คำค้นอื่น หรือดูอาหารทุกหมวดหมู่';
+ if (noFavorites && menuState === 'ready') empty.hidden = false;
  return results;
 }
 
@@ -203,6 +211,7 @@ function renderMenuPresentation(results) {
     price.textContent = baht.format(Number(item.price)) + ' บาท';
     row.append(name, price);
     if (window.PengPengCart) row.append(window.PengPengCart.addButton(item));
+    if (window.PengPengFavorites) row.append(window.PengPengFavorites.createButton(item));
     list.append(row);
    });
    group.append(heading, list);
@@ -251,6 +260,7 @@ async function loadPublicMenu() {
   }));
   menuState = 'ready';
   window.PengPengCart?.setCatalog(publicMenu);
+  window.PengPengFavorites?.reconcile(publicMenu);
   updateFilters();
   status.textContent = publicMenu.length ? '' : 'ยังไม่มีเมนูที่พร้อมให้บริการในขณะนี้';
  } catch {
@@ -266,6 +276,25 @@ async function loadPublicMenu() {
 }
 
 if (menuGrid) {
+ const favoriteToggle = document.querySelector('#favorites-toggle');
+ const syncFavoriteFilter = () => {
+  favoriteToggle.setAttribute('aria-pressed', String(favoritesOnly));
+  document.querySelector('#favorites-count').textContent = String(window.PengPengFavorites?.count() || 0);
+ };
+ favoriteToggle.addEventListener('click', () => { favoritesOnly = !favoritesOnly; syncFavoriteFilter(); renderMenu(); });
+ window.addEventListener('peng-peng-favorites-change', () => {
+  syncFavoriteFilter();
+  if (favoritesOnly) {
+   const focused = document.activeElement;
+   const id = focused?.dataset.favoriteId;
+   renderMenu();
+   if (id) {
+    const replacement = [...menuGrid.querySelectorAll('.favorite-button')].find(button => button.dataset.favoriteId === id);
+    (replacement || favoriteToggle).focus();
+   }
+  }
+ });
+ syncFavoriteFilter();
  updateFilters();
  document.querySelector('#menu-search').addEventListener('input', renderMenu);
  document.querySelector('#clear-search').addEventListener('click', () => {
@@ -276,6 +305,8 @@ if (menuGrid) {
  document.querySelector('#reset-filters').addEventListener('click', () => {
   document.querySelector('#menu-search').value = '';
   selectedCategory = 'ทั้งหมด';
+  favoritesOnly = false;
+  syncFavoriteFilter();
   updateFilters();
   renderMenu();
   document.querySelector('#menu-search').focus();

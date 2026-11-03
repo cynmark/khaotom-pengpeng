@@ -1,0 +1,24 @@
+.favorite-button { display: inline-grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px; padding: 10px; border: 1px solid #d3b8a1; border-radius: 50%; background: #fffdf8; color: #8f171c; cursor: pointer; transition: background-color .18s ease, transform .18s ease; }
+.favorite-button svg { pointer-events: none; }
+.favorite-button[aria-pressed="true"] { border-color: #a1262c; background: #f9e6df; color: #981f26; }
+.favorite-button[aria-pressed="true"] svg { fill: currentColor; }
+.favorite-button:hover { background: #f7e6df; }
+.favorite-button:active { transform: scale(.94); }
+.favorite-button:focus-visible,.favorites-toggle:focus-visible { outline: 3px solid #b67720; outline-offset: 4px; }
+.favorite-button:disabled { opacity: .45; cursor: not-allowed; }
+.food-photo > .favorite-button { position: absolute; z-index: 2; right: 12px; top: 12px; box-shadow: 0 3px 12px #39282422; }
+.food-info > .favorite-button { align-self: flex-end; margin-bottom: 12px; }
+.menu-page .classic-menu-row > .favorite-button { margin-left: 0; }
+.menu-filter-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; min-width: 0; }
+.favorites-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 9px 15px; border: 1px solid #b77d6b; border-radius: 999px; background: #fffdf8; color: #80171d; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; white-space: nowrap; }
+.favorites-toggle[aria-pressed="true"] { background: #80171d; color: #fff7e9; border-color: #80171d; }
+.favorites-toggle:hover { box-shadow: 0 3px 12px #80171d18; }
+.favorites-count { font-size: 12px; }
+.favorites-empty-hint { color: #756253; }
+@media(max-width:580px) {
+ .menu-filter-controls { align-items: stretch; gap: 10px; }
+ .favorites-toggle { align-self: flex-start; }
+ .menu-page .classic-menu-row > .cart-add { margin-left: 0; flex: 1 1 auto; }
+ .menu-page .classic-menu-row > .favorite-button { flex-basis: 44px; }
+}
+@media(prefers-reduced-motion:reduce) { .favorite-button { transition: none; } .favorite-button:active { transform: none; } }

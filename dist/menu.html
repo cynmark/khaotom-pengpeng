@@ -12,8 +12,10 @@
   <script src="/supabase-config.js" defer></script>
   <script src="/supabase-client.js" defer></script>
   <script src="/cart.js?v=9" defer></script>
-  <script src="/app.js?v=9" defer></script>
+  <script src="/favorites.js?v=10" defer></script>
+  <script src="/app.js?v=10" defer></script>
   <link rel="stylesheet" href="/cart.css?v=9">
+  <link rel="stylesheet" href="/favorites.css?v=10">
 </head>
 <body>
   <a class="skip-link" href="#main">ข้ามไปยังเนื้อหา</a>
@@ -26,7 +28,7 @@
     <section class="menu-page container">
       <a class="breadcrumb" href="/">หน้าแรก / <span>เมนูอาหาร</span></a>
       <div class="menu-title"><p class="eyebrow">SOMETHING FOR EVERY APPETITE</p><h1>เลือกจานโปรด<br><span>ให้มื้อนี้อร่อยขึ้น</span></h1><p>ข้าวต้มร้อน ๆ กับข้าวรสคุ้นเคย เลือกความอร่อยในแบบของคุณ</p></div>
-      <div class="menu-toolbar"><div class="filters" role="group" aria-label="หมวดหมู่อาหาร"></div><div class="search-wrap"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="sr-only" for="menu-search">ค้นหาชื่อเมนู คำอธิบาย หรือหมวดหมู่</label><input type="search" id="menu-search" placeholder="ค้นหาเมนูที่อยากกิน…" autocomplete="off"><button id="clear-search" aria-label="ล้างคำค้นหา" hidden>×</button></div></div>
+      <div class="menu-toolbar"><div class="menu-filter-controls"><button id="favorites-toggle" class="favorites-toggle" type="button" aria-pressed="false" aria-controls="menu-grid"><span aria-hidden="true">♥</span> รายการโปรด <span id="favorites-count" class="favorites-count">0</span></button><div class="filters" role="group" aria-label="หมวดหมู่อาหาร"></div></div><div class="search-wrap"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="sr-only" for="menu-search">ค้นหาชื่อเมนู คำอธิบาย หรือหมวดหมู่</label><input type="search" id="menu-search" placeholder="ค้นหาเมนูที่อยากกิน…" autocomplete="off"><button id="clear-search" aria-label="ล้างคำค้นหา" hidden>×</button></div></div>
       <div class="menu-results-heading"><h2>เมนูอาหาร</h2><span id="result-count" role="status" aria-live="polite"></span></div>
       <p class="data-note" id="menu-load-status" role="status" aria-live="polite">กำลังโหลดเมนู...</p>
       <button id="retry-menu" class="button outline" type="button" hidden>ลองอีกครั้ง</button>
