@@ -1,17 +1,150 @@
-# ข้าวต้มเพ่งเพ้ง
+# ข้าวต้มเพ่งเพ้ง (Khao Tom Peng Peng)
 
-A static Thai restaurant website. Serve `dist/` at the root of a web origin; no build or package installation is required.
+เว็บไซต์ร้านข้าวต้มเพ่งเพ้งสำหรับดูเมนูและราคา ชมภาพร้าน และค้นหาข้อมูลการเดินทาง ผู้ดูแลร้านสามารถจัดการเมนูและภาพผ่าน Admin Dashboard ได้โดยไม่ต้องแก้โค้ดเว็บไซต์
 
-For local development, run `python -m http.server 4173 --directory dist` and open `http://127.0.0.1:4173/`. Serve the files over HTTP instead of opening them directly from disk.
+## เว็บไซต์ที่เปิดใช้งาน
 
-- `index.html`: restaurant information, featured dishes, gallery, and directions.
-- `menu.html`: searchable Supabase menu with category and favorites filters.
-- `credits.html`: image sources, credits, and copyright information.
-- `admin.html`: separate Supabase Auth session and authorized menu, gallery, and upload management.
+**[เปิดเว็บไซต์ข้าวต้มเพ่งเพ้ง](https://khaotom-pengpeng-public.pages.dev/)** · [ซอร์สโค้ดบน GitHub](https://github.com/cynmark/khaotom-pengpeng)
 
-`app.js` handles shared navigation, footer, and public menu rendering. `gallery.js`, `cart.js`, and `favorites.js` handle their respective public features. The cart and favorites store only menu IDs (and quantities for the cart) in the visitor's browser. The cart estimates costs and does not submit orders.
+## ภาพรวมและวัตถุประสงค์
 
-`supabase-config.js` contains the HTTPS project origin and browser-safe publishable key. Never put privileged credentials in `dist/`. Public access and Admin writes depend on Supabase RLS and Storage policies. Some menu photos are external; verify image rights and stable sources before launch.
+เว็บไซต์รวบรวมข้อมูลร้านและเมนูที่อัปเดตจากฐานข้อมูลไว้ในที่เดียว ผู้เข้าชมค้นหาอาหาร บันทึกเมนูที่สนใจ และคำนวณค่าอาหารก่อนเดินทางได้ ส่วนผู้ดูแลสามารถแก้ข้อมูลที่เปลี่ยนบ่อย เช่น ราคา สถานะการขาย และภาพร้าน ผ่านหน้าจัดการเนื้อหา
 
-For hosting configuration, release checks, and open issues, see [Phase 11A audit](AUDIT.md).
+## ฟีเจอร์ปัจจุบัน
 
+### สำหรับผู้เข้าชมเว็บไซต์
+
+- **หน้าแรกและข้อมูลร้าน:** เมนูแนะนำ ประวัติร้าน แกลเลอรี ข้อมูลติดต่อ แผนที่ Google Maps และลิงก์ดูเส้นทาง
+- **เมนูอาหาร:** โหลดรายการที่พร้อมขายจาก Supabase ค้นหาด้วยชื่อ คำอธิบาย หรือหมวดหมู่ และกรองตามหมวดหมู่หรือรายการแนะนำ หน้าแรกแสดงเมนูแนะนำที่มี URL รูปภาพที่ใช้ได้ไม่เกิน 6 รายการ ส่วนหน้าเมนูแยกการ์ดแนะนำที่มี URL รูปภาพ (Featured) ออกจากรายการอาหารตามหมวดหมู่ (Classic)
+- **ตะกร้าอาหาร:** เพิ่มเมนู ปรับจำนวน นำรายการออก ล้างตะกร้า และคัดลอกรายการพร้อมยอดรวม ราคาที่ใช้คำนวณอ้างอิงข้อมูลเมนูปัจจุบัน ตะกร้าใช้ประมาณค่าอาหารเท่านั้น ไม่มีการส่งหรือยืนยันคำสั่งซื้อและไม่มีการชำระเงินออนไลน์
+- **รายการโปรด (Favorites):** บันทึกเมนูจากหน้าแรกหรือหน้าเมนู และกรองเฉพาะรายการที่บันทึกไว้ร่วมกับการค้นหาและตัวกรองหมวดหมู่ได้
+- **การแสดงผล:** รองรับมือถือ แท็บเล็ต และคอมพิวเตอร์ พร้อมข้อความแจ้งสถานะเมื่อโหลดข้อมูลไม่สำเร็จและภาพสำรองเมื่อรูปโหลดไม่ได้
+
+### สำหรับผู้ดูแลระบบ
+
+- เข้าสู่ระบบด้วยอีเมลและรหัสผ่านผ่าน Supabase Authentication แล้วตรวจสิทธิ์จากตาราง `admin_users`
+- เพิ่ม แก้ไข และลบเมนู จัดการชื่อ คำอธิบาย ราคา หมวดหมู่ รูปภาพ สถานะพร้อมขาย สถานะเมนูแนะนำ และลำดับการแสดงผล
+- เพิ่ม แก้ไข และลบรายการภาพร้าน กำหนดการซ่อนหรือแสดงภาพ และจัดลำดับการแสดงผล
+- ใช้ URL รูปภาพหรืออัปโหลดไฟล์ JPEG, PNG และ WebP ขนาดไม่เกิน 5 MB ผ่าน Supabase Storage โดยแบบฟอร์มมีตัวอย่างภาพให้ตรวจสอบก่อนบันทึก
+
+## เทคโนโลยีที่ใช้ (Technology Stack)
+
+| เทคโนโลยี | หน้าที่ |
+| --- | --- |
+| HTML5, CSS3, Vanilla JavaScript | โครงสร้างหน้าเว็บ รูปแบบการแสดงผล และการโต้ตอบในเบราว์เซอร์ |
+| Supabase และ PostgreSQL | เก็บข้อมูลเมนู แกลเลอรี และรายชื่อบัญชีผู้ดูแล |
+| Supabase Authentication | เข้าสู่ระบบและจัดการเซสชันของผู้ดูแล |
+| Supabase Row Level Security (RLS) | ควบคุมสิทธิ์อ่านและแก้ไขข้อมูลในระดับแถว |
+| Supabase Storage | เก็บไฟล์ภาพที่อัปโหลดจากหน้าจัดการ |
+| `localStorage` | เก็บตะกร้าและรายการโปรดในเบราว์เซอร์ |
+| Cloudflare Pages | ให้บริการไฟล์เว็บไซต์แบบ Static |
+| Git และ GitHub | จัดการเวอร์ชันและเก็บซอร์สโค้ด |
+
+เว็บไซต์ไม่มีเซิร์ฟเวอร์ Express หรือ Node.js สำหรับ Production และไม่ต้องติดตั้งแพ็กเกจเพื่อรัน Frontend โดยเบราว์เซอร์โหลด Supabase JavaScript SDK จาก CDN ตามเวอร์ชันที่กำหนดไว้ในโค้ด
+
+## สถาปัตยกรรมระบบ (System Architecture)
+
+Cloudflare Pages ให้บริการ HTML, CSS และ JavaScript จาก `dist/` เบราว์เซอร์ประมวลผลหน้าเว็บและส่งคำขอไปยัง Supabase โดยตรง ฝั่งผู้เข้าชมอ่านข้อมูลเมนูและภาพร้าน ส่วนหน้าผู้ดูแลใช้ไคลเอนต์ที่แยกเซสชันสำหรับ Authentication และจัดการข้อมูลตามสิทธิ์ที่ RLS กำหนด
+
+PostgreSQL เก็บข้อมูลรายการและ URL รูปภาพ รูปที่อัปโหลดผ่านหน้าจัดการเก็บใน Supabase Storage ส่วนรูปที่อ้างถึงด้วย URL ภายนอกจะโหลดจากแหล่งนั้นโดยตรง ตะกร้าและรายการโปรดทำงานในเบราว์เซอร์และไม่สร้างรายการสั่งซื้อในฐานข้อมูล
+
+## การจัดเก็บข้อมูล (Data Storage)
+
+### Supabase PostgreSQL
+
+| ตาราง | ข้อมูลสำคัญ |
+| --- | --- |
+| `menu_items` | `id`, `name`, `description`, `price`, `category`, `image_url`, `is_recommended`, `is_available`, `display_order` |
+| `gallery_items` | `id`, `title`, `description`, `image_url`, `is_visible`, `display_order` |
+| `admin_users` | `id` ที่ตรงกับรหัสบัญชีใน Supabase Authentication สำหรับตรวจสิทธิ์ผู้ดูแล |
+
+### Supabase Storage
+
+Bucket `restaurant-images` เก็บภาพที่อัปโหลดผ่าน Admin Dashboard โดยแยกไฟล์เมนูและภาพร้านไว้ใน `menu/` และ `gallery/` ตามลำดับ แบบฟอร์มนำ Public URL ของภาพที่อัปโหลดสำเร็จไปใช้เป็นค่า `image_url` ของรายการเมื่อผู้ดูแลกดบันทึก
+
+### Browser localStorage
+
+ตะกร้าบันทึกเฉพาะรหัสเมนูและจำนวน โดยใช้ราคาล่าสุดจากข้อมูลเมนูเมื่อโหลดสำเร็จ รายการโปรดบันทึกเฉพาะรหัสเมนู ข้อมูลทั้งสองชุดแยกตามเบราว์เซอร์ โปรไฟล์ และโดเมน การเปลี่ยนอุปกรณ์ โดเมน หรือล้างข้อมูลเว็บไซต์จึงอาจทำให้ไม่เห็นรายการเดิม ไม่มีบัญชีลูกค้าสำหรับซิงก์ข้ามอุปกรณ์
+
+## ความปลอดภัยของระบบ
+
+- หน้า Admin ตรวจบัญชีที่เข้าสู่ระบบและสมาชิกใน `admin_users` ก่อนทำรายการ การอนุญาต `INSERT`, `UPDATE` และ `DELETE` ต้องบังคับใช้ด้วย RLS ที่ Supabase ไม่ได้อาศัยการซ่อนปุ่มหรือหน้าเว็บเพียงอย่างเดียว
+- ผู้เข้าชมไม่ต้องเข้าสู่ระบบเพื่ออ่านข้อมูลสาธารณะ หน้าเมนูขอเฉพาะรายการที่พร้อมขาย และ Gallery แสดงเฉพาะแถว `is_visible = true` การตรวจล่าสุดใน [AUDIT.md](AUDIT.md) ยืนยันว่าไคลเอนต์แบบไม่เข้าสู่ระบบไม่เห็นแถวภาพที่ซ่อนอยู่
+- Storage Policies ควบคุมสิทธิ์เขียนไฟล์แยกจาก RLS ของตาราง การซ่อนรายการ Gallery ไม่ได้ทำให้ Public URL ของไฟล์กลายเป็นส่วนตัว ผู้ที่มีลิงก์ไฟล์อาจยังเปิดภาพได้โดยตรง
+- `dist/supabase-config.js` ใช้ Project URL และ Publishable Key ที่เหมาะกับ Frontend เท่านั้น ห้ามใส่ Service Role Key, Secret Key, รหัสผ่าน หรือข้อมูลรับรองที่มีสิทธิ์สูงในไฟล์ที่เผยแพร่
+
+## โครงสร้างโปรเจกต์ (Project Structure)
+
+```text
+khaotom-pengpeng/
+├── README.md                # คู่มือโปรเจกต์
+├── AUDIT.md                 # ผลตรวจสอบและรายการตรวจสำหรับเผยแพร่
+└── dist/                    # ไฟล์ที่ให้บริการบนเว็บไซต์
+    ├── index.html           # หน้าแรก ประวัติร้าน แกลเลอรี และข้อมูลติดต่อ
+    ├── menu.html            # เมนู ค้นหา และตัวกรอง
+    ├── admin.html           # หน้าเข้าสู่ระบบและจัดการเนื้อหา
+    ├── credits.html         # เครดิตและลิขสิทธิ์
+    ├── app.js               # เมนูสาธารณะ การนำทาง และส่วนท้าย
+    ├── cart.js              # ตะกร้าและการคำนวณค่าอาหาร
+    ├── favorites.js         # รายการโปรดและการบันทึกในเบราว์เซอร์
+    ├── gallery.js           # โหลดและแสดงภาพร้าน
+    ├── admin.js             # เซสชัน สิทธิ์ และการจัดการเมนู
+    ├── admin-gallery.js     # การจัดการแกลเลอรี
+    ├── admin-upload.js      # การตรวจไฟล์ อัปโหลด และแสดงตัวอย่าง
+    ├── supabase-client.js   # ไคลเอนต์สำหรับผู้เข้าชมและผู้ดูแล
+    ├── supabase-config.js   # การตั้งค่าที่ใช้ในเบราว์เซอร์
+    ├── styles.css           # รูปแบบหลักของเว็บไซต์
+    ├── cart.css             # รูปแบบตะกร้า
+    ├── favorites.css        # รูปแบบปุ่มและตัวกรองรายการโปรด
+    ├── admin.css            # รูปแบบหน้าผู้ดูแล
+    └── assets/              # โลโก้และภาพที่เก็บไว้ในโปรเจกต์
+```
+
+## การติดตั้งและใช้งานในเครื่อง (Local Development)
+
+ต้องมี Git และ Python 3 สำหรับตัวอย่างนี้ ไม่ต้องใช้ `npm install` หรือสั่ง Build
+
+```bash
+git clone https://github.com/cynmark/khaotom-pengpeng.git
+cd khaotom-pengpeng
+python -m http.server 4173 --bind 127.0.0.1 --directory dist
+```
+
+เปิด [หน้าแรกในเครื่อง](http://127.0.0.1:4173/) หรือไปที่ `/menu.html` และ `/admin.html` จากเซิร์ฟเวอร์เดียวกัน ควรเปิดผ่าน HTTP แทนการเปิดไฟล์ HTML จากดิสก์โดยตรง เนื่องจากลิงก์และไฟล์ประกอบใช้พาธจากรากเว็บไซต์
+
+การโหลดเมนูและ Gallery ต้องเข้าถึง Supabase และ CDN ได้ หากใช้การตั้งค่าเดิม การรันในเครื่องจะเชื่อมกับโครงการ Supabase ที่ระบุในไฟล์ตั้งค่า การบันทึกผ่าน Admin จึงอาจแก้ข้อมูลจริง ควรใช้โครงการทดสอบสำหรับการทดลองเขียนข้อมูล
+
+## การเผยแพร่เว็บไซต์ (Deployment)
+
+เว็บไซต์ Public ให้บริการผ่าน Cloudflare Pages ค่าต่อไปนี้ใช้สำหรับตั้งค่าโครงการแบบ [Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/) ให้ตรงกับโครงสร้าง Repository นี้
+
+| การตั้งค่า | ค่า |
+| --- | --- |
+| Repository | `cynmark/khaotom-pengpeng` |
+| Production branch | `main` |
+| Framework preset | None |
+| Build command | เว้นว่าง |
+| Build output directory | `dist` |
+| Root directory | ราก Repository (เว้นค่า Path หากใช้ค่าเริ่มต้น) |
+
+เมื่อเชื่อม GitHub และเปิดการเผยแพร่อัตโนมัติ Cloudflare Pages จะ Deploy หลัง Push ไปยัง Branch ที่กำหนด ให้ตรวจสถานะและ Commit ที่เผยแพร่จากหน้า Deployments ก่อนทดสอบ URL จริง
+
+URL Public ในหัวข้อด้านบนใช้สำหรับลูกค้า ส่วน URL ที่อยู่หลัง Cloudflare Access ต้องยืนยันสิทธิ์ก่อนเข้าใช้งาน หาก Public และ Staging ใช้ไฟล์ตั้งค่า Supabase เดียวกัน ทั้งสองจะเชื่อมฐานข้อมูลเดียวกันแม้ใช้คนละ URL ควรตรวจปลายทางของ Supabase ก่อนทดสอบการเขียนข้อมูลจาก Staging
+
+## ข้อจำกัดของระบบ
+
+- ไม่มีระบบสั่งซื้อ ยืนยันออเดอร์ หรือชำระเงิน ตะกร้ามีไว้ประมาณค่าอาหารเท่านั้น
+- ตะกร้าและรายการโปรดอยู่ในเบราว์เซอร์และไม่ซิงก์ข้ามอุปกรณ์
+- เมนู แกลเลอรี และการจัดการเนื้อหาต้องใช้การเชื่อมต่อกับ Supabase หากบริการหยุดชั่วคราว หน้าเว็บแบบ Static ยังเปิดได้ แต่ข้อมูลแบบ Dynamic อาจไม่แสดง
+- ภาพจากภายนอกอาจโหลดไม่ได้หากแหล่งต้นทางเปลี่ยน URL หรือจำกัดการแสดงผล และ Public Storage ไม่เหมาะกับไฟล์ที่ต้องจำกัดสิทธิ์อ่าน
+
+## การดูแลและบำรุงรักษา
+
+1. อัปเดตเมนู ราคา สถานะการขาย และภาพร้านผ่าน Admin Dashboard แล้วตรวจผลบนหน้า Public
+2. ตรวจสถานะ Supabase, URL รูปภาพ และสิทธิ์เข้าถึงไฟล์เป็นระยะ โดยเฉพาะเมื่อเปลี่ยนแหล่งภาพหรือซ่อนรายการ
+3. หลังแก้โค้ด ให้ทดสอบในเครื่องทั้งมือถือและเดสก์ท็อป รวมถึงการค้นหา ตะกร้า รายการโปรด และส่วนที่ได้รับผลกระทบ หลัง Push ให้ตรวจ Deploy และเปิดหน้า Public อีกครั้ง
+4. สำรองข้อมูลเมนู แกลเลอรี และไฟล์ภาพตามความเหมาะสม เก็บข้อมูลสำรองและข้อมูลรับรองไว้นอก Repository สาธารณะ
+
+## เครดิตและข้อมูลเพิ่มเติม
+
+ดูแหล่งที่มาของภาพและข้อมูลลิขสิทธิ์ที่ [หน้าเครดิตและลิขสิทธิ์](https://khaotom-pengpeng-public.pages.dev/credits.html) หรือ [ไฟล์เครดิตใน Repository](dist/credits.html) ส่วนผลทดสอบและประเด็นที่ต้องยืนยันเพิ่มเติมบันทึกไว้ใน [AUDIT.md](AUDIT.md)
